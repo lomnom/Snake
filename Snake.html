@@ -1,0 +1,96 @@
+<head>
+	<script>
+		//Defining sprite and display objects
+		window.onload = function () {
+		    game();
+		};
+		var canvasCount=0;
+		var spriteSz=8;
+		let palette={
+			red   : "rgba(255,0,0,255)",
+			green : "rgba(0,255,0,255)",
+			blue  : "rgba(0,0,255,255)",
+			cyan  : "rgba(255,255,0,255)",
+			black : "rgba(0,0,0,255)"
+		}
+
+		const multiplyArray = (arr, length) => 
+		  Array.from({ length }, () => arr).flat()
+
+		let sprites={
+			empty :multiplyArray([multiplyArray([palette.black],8)],8)
+		}
+
+		function square(color,x,y,size,ctx){
+			ctx.fillStyle = color;
+			ctx.fillRect( x, y, size, size );
+		}
+
+		function pixel(color,x,y,size,ctx){
+			square(color,x*size,y*size,size,ctx);
+		}
+
+		class Canvas{
+			constructor(width,height,scale,within){
+				this.canvasArea=canvasArea;
+				this.id=canvasCount;
+				canvasArea.innerHTML='<canvas height="'+ height*spriteSz*scale +'" width="'+ width*spriteSz*scale +'" id="'+this.id+'" class="gameCanvas">Ur browser kinda L tho</canvas>\n';
+				canvasCount+=1;
+				this.height=height;
+				this.width=width;
+				this.canvas=document.getElementById(this.id);
+				this.ctx=this.canvas.getContext('2d');
+				this.scale=scale;
+			}
+
+			setSpixel(color,sx,sy,x,y){
+				pixel(color,sx*spriteSz+x,sy*spriteSz+y,this.scale,this.ctx);
+			}
+
+			setSprite(sprite,sx,sy){
+				for (var y=0;y<spriteSz;y++){
+					for (var x=0;x<spriteSz;x++){
+						this.setSpixel(sprite[y][x],sx,sy,x,y);
+					}
+				}
+			}
+
+			fillSprite(sprite){
+				for (var y=0;y<this.height;y++){
+					for (var x=0;x<this.width;x++){
+						this.setSprite(sprite,x,y);
+					}
+				}
+			}
+		}
+
+		//The actual game?
+		function game(){
+			let canvasArea=document.getElementById("canvasArea");
+			canvasArea.innerHTML=" ";
+			let screen=new Canvas(23,23,2,canvasArea);
+			screen.fillSprite(sprites.empty,0,0);
+		}
+	</script>
+
+	<style>
+		body {
+			background-color: black;
+			color: white;
+		}
+		.center {
+			text-align: center;
+		}
+		.gameCanvas {
+			outline: white 3px dotted;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="gameArea" class="center">
+		<h1>Snake!</h1>
+		<div id="canvasArea">
+		</div>
+	</div>
+</body>
