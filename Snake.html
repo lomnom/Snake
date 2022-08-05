@@ -15,8 +15,9 @@
 			" ": "rgba(0,0,0,255)"
 		}
 
-		const multiplyArray = (arr, length) => 
-		  Array.from({ length }, () => arr).flat()
+		function modulo(a, b) {
+		  return ((a % b) + b) % b
+		}
 
 		function toSprite(spriteStr){
 			var sprite=[];
@@ -43,41 +44,31 @@
 			body  : toSprite(
 			        	"        "+
 			        	"        "+
-			        	"cccccccc"+
-			        	"cccccccc"+
-			        	"cccccccc"+
-			        	"cccccccc"+
+			        	"rccccccc"+
+			        	"rccccccc"+
+			        	"ccccrccc"+
+			        	"ccccrccc"+
 			        	"        "+
 			        	"        "
 				    ),
 			corner  : toSprite(
 			        	"        "+
 			        	"        "+
-			        	"cccccc  "+
-			        	"cccccc  "+
-			        	"cccccc  "+
+			        	"rccccc  "+
+			        	"rccccc  "+
+			        	"ccccrr  "+
 			        	"cccccc  "+
 			        	"  cccc  "+
 			        	"  cccc  "
 				    ),
 			food    : toSprite(
 			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"   rr   "+
-			        	"   rr   "+
-			        	"        "+
-			        	"        "+
-			        	"        "
-				    ),
-			cube    : toSprite(
-			        	"        "+
-			        	" gggggg "+
-			        	" gggggg "+
-			        	" gggggg "+
-			        	" gggggg "+
-			        	" gggggg "+
-			        	" gggggg "+
+			        	" ggrrrr "+
+			        	" ggrrrr "+
+			        	" gggrrr "+
+			        	"  ggrrr "+
+			        	"  ggggr "+
+			        	"    ggg "+
 			        	"        "
 			        )
 		}
@@ -142,13 +133,16 @@
 
 			let x=0;
 			let y=0;
-			screen.setSprite(sprites.cube,0,0);
+			screen.setSprite(sprites.body,0,0);
+			screen.setSprite(sprites.corner,1,0);
+			screen.setSprite(sprites.food,1,1);
+			// screen.setSprite(sprites.food,0,0);
 
 			function move(nx,ny){
 				screen.setSprite(sprites.empty,x,y)
-				screen.setSprite(sprites.cube,nx,ny)
-				x=nx;
-				y=ny;
+				x=modulo(nx,screen.width);
+				y=modulo(ny,screen.height);
+				screen.setSprite(sprites.food,x,y)
 			}
 
 			document.addEventListener('keydown', function(event) {
