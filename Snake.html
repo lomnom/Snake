@@ -7,18 +7,79 @@
 		var canvasCount=0;
 		var spriteSz=8;
 		let palette={
-			red   : "rgba(255,0,0,255)",
-			green : "rgba(0,255,0,255)",
-			blue  : "rgba(0,0,255,255)",
-			cyan  : "rgba(255,255,0,255)",
-			black : "rgba(0,0,0,255)"
+			r: "rgba(255,0,0,255)",
+			g: "rgba(0,255,0,255)",
+			b: "rgba(0,0,255,255)",
+			c: "rgba(0,255,255,255)",
+			n: "rgba(0,0,0,255)",
+			" ": "rgba(0,0,0,255)"
 		}
 
 		const multiplyArray = (arr, length) => 
 		  Array.from({ length }, () => arr).flat()
 
+		function toSprite(spriteStr){
+			var sprite=[];
+			for (var y=0;y<spriteSz;y++){
+				sprite.push([]);
+				for (var x=0;x<spriteSz;x++){
+					sprite[y].push(palette[spriteStr[(y*spriteSz+x)]]);
+				}
+			}
+			return sprite;
+		}
+
 		let sprites={
-			empty :multiplyArray([multiplyArray([palette.black],8)],8)
+			empty : toSprite(
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "
+				    ),
+			body  : toSprite(
+			        	"        "+
+			        	"        "+
+			        	"cccccccc"+
+			        	"cccccccc"+
+			        	"cccccccc"+
+			        	"cccccccc"+
+			        	"        "+
+			        	"        "
+				    ),
+			corner  : toSprite(
+			        	"        "+
+			        	"        "+
+			        	"cccccc  "+
+			        	"cccccc  "+
+			        	"cccccc  "+
+			        	"cccccc  "+
+			        	"  cccc  "+
+			        	"  cccc  "
+				    ),
+			food    : toSprite(
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"   rr   "+
+			        	"   rr   "+
+			        	"        "+
+			        	"        "+
+			        	"        "
+				    ),
+			cube    : toSprite(
+			        	"        "+
+			        	" gggggg "+
+			        	" gggggg "+
+			        	" gggggg "+
+			        	" gggggg "+
+			        	" gggggg "+
+			        	" gggggg "+
+			        	"        "
+			        )
 		}
 
 		function square(color,x,y,size,ctx){
@@ -64,12 +125,46 @@
 			}
 		}
 
+		let keys={
+			up:    38,
+			down:  40,
+			left:  37,
+			right: 39,
+			pause: 32 
+		}
+
 		//The actual game?
 		function game(){
 			let canvasArea=document.getElementById("canvasArea");
 			canvasArea.innerHTML=" ";
 			let screen=new Canvas(23,23,2,canvasArea);
-			screen.fillSprite(sprites.empty,0,0);
+			screen.fillSprite(sprites.empty);
+
+			let x=0;
+			let y=0;
+			screen.setSprite(sprites.cube,0,0);
+
+			function move(nx,ny){
+				screen.setSprite(sprites.empty,x,y)
+				screen.setSprite(sprites.cube,nx,ny)
+				x=nx;
+				y=ny;
+			}
+
+			document.addEventListener('keydown', function(event) {
+				if(event.keyCode == keys.up) {
+					move(x,y-1);
+				}
+				else if(event.keyCode == keys.down) {
+					move(x,y+1);
+				}
+				else if(event.keyCode == keys.left) {
+					move(x-1,y);
+				}
+				else if(event.keyCode == keys.right) {
+					move(x+1,y);
+				}
+			});
 		}
 	</script>
 
