@@ -1,6 +1,6 @@
 <head>
 	<script>
-		//Defining sprite and display objects
+		//THE ENGINE
 		window.onload = function () {
 		    game();
 		};
@@ -16,32 +16,25 @@
 			" ": "rgba(0,0,0,255)"
 		}
 
-		function modulo(a, b) {
-		  return ((a % b) + b) % b
-		}
-
-		function toSprite(spriteStr){
-			var sprite=[];
-			for (var y=0;y<spriteSz;y++){
-				sprite.push([]);
-				for (var x=0;x<spriteSz;x++){
-					sprite[y].push(palette[spriteStr[(y*spriteSz+x)]]);
-				}
-			}
-			return sprite;
+		let spriteInit={
+			fromArt: 1,
+			fromMatrix: 2
 		}
 
 		let t={
-			flip:1,
 			rotate:2,
 			left:1,
 			right:2,
 			flipped:3,
+
+			flip:1,
 			vertical:1,
 			horizontal:2
 		}
 
 		function transform(sprite,type,arg){
+			copied=sprite.copy();
+			sprite=copied.sprite;
 			if (type==t.flip){
 				if (arg==t.vertical){
 					sprite.reverse();
@@ -51,7 +44,7 @@
 						sprite[row].reverse();
 					}
 				}
-				return sprite;
+				return copied;
 			}
 			else if (type=t.rotate){
 				let rotated=[];
@@ -72,73 +65,44 @@
 					}
 				}
 				else if (arg==t.flipped){
-					return transform(transform(sprite,t.flip,t.horizontal),t.flip,t.vertical);
+					return transform(transform(copied,t.flip,t.horizontal),t.flip,t.vertical);
 				}
-				return rotated;
+				copied.sprite=rotated;
+				return copied;
 			}
 		}
 
-		let sprites={
-			empty : toSprite(
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "
-				    ),
-			body  : toSprite(
-			        	"        "+
-			        	"        "+
-			        	"rccccccc"+
-			        	"rccccccc"+
-			        	"ccccrccc"+
-			        	"ccccrccc"+
-			        	"        "+
-			        	"        "
-				    ),
-			corner  : toSprite(
-			        	"        "+
-			        	"        "+
-			        	"rccccc  "+
-			        	"rccccc  "+
-			        	"ccccrr  "+
-			        	"cccccc  "+
-			        	"  cccc  "+
-			        	"  cccc  "
-				    ),
-			food    : toSprite(
-			        	"        "+
-			        	" ggrrrr "+
-			        	" ggrrrr "+
-			        	" gggrrr "+
-			        	"  ggrrr "+
-			        	"  ggggr "+
-			        	"    ggg "+
-			        	"        "
-			        ),
-			head    : toSprite(
-			        	"        "+
-			        	"    cccc"+
-			        	"rcccc  c"+
-			        	"rccccccc"+
-			        	"ccccrccr"+
-			        	"ccccrccc"+
-			        	"        "+
-			        	"        "
-			        ),
-			tail : toSprite(
-			        	"        "+
-			        	"        "+
-			        	"      cc"+
-			        	"    cccc"+
-			        	"  cccrcc"+
-			        	" ccccrcc"+
-			        	"        "+
-			        	"        "
-				    )
+		class Sprite{
+			constructor(from,data){
+				if (from==spriteInit.fromArt){
+					this.fromArt(data);
+				} else {
+					this.sprite=data;
+				}
+			}
+
+			fromArt(spriteStr){
+				var sprite=[];
+				for (var y=0;y<spriteSz;y++){
+					sprite.push([]);
+					for (var x=0;x<spriteSz;x++){
+						sprite[y].push(palette[spriteStr[(y*spriteSz+x)]]);
+					}
+				}
+				this.sprite=sprite;
+			}
+
+			copy(){
+				var newSprite=[];
+				for (var y=0;y<spriteSz;y++){
+					newSprite.push([...this.sprite[y]]);
+				}
+				return new Sprite(spriteInit.fromMatrix,newSprite);
+			}
+
+			transform(type,arg){
+				return transform(this,type,arg);
+			}
 		}
 
 		function square(color,x,y,size,ctx){
@@ -168,6 +132,7 @@
 			}
 
 			setSprite(sprite,sx,sy){
+				sprite=sprite.sprite;
 				for (var y=0;y<spriteSz;y++){
 					for (var x=0;x<spriteSz;x++){
 						this.setSpixel(sprite[y][x],sx,sy,x,y);
@@ -189,46 +154,259 @@
 			down:  40,
 			left:  37,
 			right: 39,
-			pause: 32 
+			grow:  71
 		}
 
-		//The actual game?
+		buttons={};
+
+		/////////////////////////////THE GAME
+		let sprites={
+			empty : new Sprite(
+						spriteInit.fromArt,
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "+
+			        	"        "
+				    ),
+			body  : new Sprite(
+						spriteInit.fromArt,
+			        	"        "+
+			        	"        "+
+			        	"bccccccc"+
+			        	"bccccccc"+
+			        	"ccccrccc"+
+			        	"ccccrccc"+
+			        	"        "+
+			        	"        "
+				    ),
+			corner  : new Sprite(
+						spriteInit.fromArt,
+			        	"        "+
+			        	"        "+
+			        	"  rrcccc"+
+			        	"  cccccc"+
+			        	"  cccrcc"+
+			        	"  cccrcc"+
+			        	"  cccr  "+
+			        	"  rrcc  "
+				    ),
+			food    : new Sprite(
+						spriteInit.fromArt,
+			        	" ggrrrr "+
+			        	" ggr rrr"+
+			        	" ggrrr r"+
+			        	" gggrrrr"+
+			        	"  ggrrrr"+
+			        	"  gggggg"+
+			        	"    gggg"+
+			        	"        "
+			        ),
+			head    : new Sprite(
+						spriteInit.fromArt,
+			        	"        "+
+			        	"   ccccc"+
+			        	"rcccc  c"+
+			        	"rccccccc"+
+			        	"ccccrccr"+
+			        	"ccccrccc"+
+			        	"        "+
+			        	"        "
+			        ),
+			tail : new Sprite(
+						spriteInit.fromArt,
+			        	"        "+
+			        	"        "+
+			        	"      cc"+
+			        	"    cccc"+
+			        	"  cccrcc"+
+			        	" ccccrcc"+
+			        	"        "+
+			        	"        "
+				    ),
+			marker	: new Sprite(
+						spriteInit.fromArt,
+						"        "+
+						"        "+
+						"        "+
+						"rrrr    "+
+						"    bbbb"+
+						"        "+
+						"        "+
+						"        "
+					) 
+		}
+
+		function clkrot(direction){
+			return [-direction[1],direction[0]];
+		}
+
+		function isclk(direction,newdirection){
+			return dirsame(clkrot(direction),newdirection);
+		}
+
+		function dirsame(d1,d2){
+			return ((d1[0] == d2[0]) && (d1[1] == d2[1]));
+		}
+
+		function dirdiff(d1,d2){
+			return [d1[0]-d2[0],d1[1]-d2[1]];
+		}
+
+		function dir2rot(dir){
+			var rotate=undefined;
+			if (dirsame(dir,[0,1])){
+				rotate=t.right;
+			} else if (dirsame(dir,[-1,0])){
+				rotate=t.flipped;
+			} else if (dirsame(dir,[0,-1])){
+				rotate=t.left;
+			}
+			return rotate;
+		}
+
+		function dirRot(sprite,dir){
+			var rotate=dir2rot(dir);
+			if (rotate){
+				return sprite.transform(t.rotate,rotate);
+			} else {
+				return sprite;
+			}
+		}
+
+		function flipdir(dir){
+			return [-dir[0],-dir[1]];
+		}
+
+		class Snake{
+			constructor(headX,headY,body,direction){
+				this.headX=headX;
+				this.headY=headY;
+				this.body=body;
+				this.direction=direction;
+			}
+
+			render(screen){
+				screen.setSprite(dirRot(sprites.head,this.direction),this.headX,this.headY);
+				var x=this.headX;
+				var y=this.headY;
+				length=this.body.length;
+				for (var pos=0;pos<length;pos++){
+					var seg=this.body[pos];
+					var nextseg=this.body[pos+1];
+					x-=seg[0];
+					y-=seg[1]; 
+					if (nextseg && dirsame(seg,nextseg)){
+						screen.setSprite(dirRot(sprites.body,seg),x,y);
+					} else if (!nextseg){
+						screen.setSprite(dirRot(sprites.tail,seg),x,y);
+					} else {
+						if (isclk(nextseg,seg)){
+							screen.setSprite(dirRot(sprites.corner,seg),x,y);
+						} else {
+							screen.setSprite(dirRot(sprites.corner,flipdir(nextseg)),x,y);
+						}
+					}
+				}
+			}
+
+			step(grow,direction){
+				if (!grow){
+					this.body.pop(this.body.length-1)
+				}
+				if (direction){
+					this.direction=direction;
+				}
+				this.headX+=this.direction[0];
+				this.headY+=this.direction[1];
+
+				this.body=[this.direction,...this.body];
+			}
+		}
+
+		function modulo(a, b) {
+			return ((a % b) + b) % b
+		}
+
+		function random(min, max) {
+			return Math.floor(Math.random() * (max - min + 1) + min); 
+		}
+
 		var screen=undefined;
 		function game(){
 			let canvasArea=document.getElementById("canvasArea");
 			canvasArea.innerHTML=" ";
 			screen=new Canvas(23,23,2,canvasArea);
 			screen.fillSprite(sprites.empty);
+			
+			snake=new Snake(4,4,[[1,0]],[1,0]);
+			snake.render(screen)
 
-			let x=0;
-			let y=0;
-			screen.setSprite(sprites.tail,0,0);
-			screen.setSprite(sprites.body,1,0);
-			screen.setSprite(sprites.head,2,0);
-			screen.setSprite(sprites.food,1,1);
-			// screen.setSprite(sprites.food,0,0);
+			var tickspeed=15;
+			var direction=undefined;
+			var grow=false;
+			var fruitX=random(0,screen.width-1);
+			var fruitY=random(0,screen.height-1);
 
-			function move(nx,ny){
-				screen.setSprite(sprites.empty,x,y)
-				x=modulo(nx,screen.width);
-				y=modulo(ny,screen.height);
-				screen.setSprite(sprites.food,x,y)
+			buttons={
+				up: () => {
+					direction=[0,-1];
+				},
+				down: () => {
+					direction=[0,1];
+				},
+				left: () => {
+					direction=[-1,0];
+				},
+				right: () => {
+					direction=[1,0];
+				},
+				grow: () => {
+					grow=true;
+				}
 			}
 
 			document.addEventListener('keydown', function(event) {
 				if(event.keyCode == keys.up) {
-					move(x,y-1);
+					direction=[0,-1];
 				}
 				else if(event.keyCode == keys.down) {
-					move(x,y+1);
+					direction=[0,1];
 				}
 				else if(event.keyCode == keys.left) {
-					move(x-1,y);
+					direction=[-1,0];
 				}
 				else if(event.keyCode == keys.right) {
-					move(x+1,y);
+					direction=[1,0];
+				}
+				else if(event.keyCode == keys.grow){
+					grow=true;
+				} else{
+					console.log(event.keyCode);
 				}
 			});
+
+			var score=0
+			function tick(){
+				if (snake.headY==fruitY && snake.headX==fruitX){
+					fruitX=random(0,screen.width-1);
+					fruitY=random(0,screen.height-1);
+					score++;
+					document.getElementById("score").innerHTML="Score: "+score;
+					grow=true;
+				}
+				snake.step(grow,direction);
+				screen.fillSprite(sprites.empty);
+				snake.render(screen);
+				screen.setSprite(sprites.food.transform(t.rotate,random(1,3)),fruitX,fruitY);
+				direction=undefined;
+				grow=false;
+				setTimeout(tick, 1000/tickspeed);
+			}
+			tick()
 		}
 	</script>
 
@@ -236,12 +414,25 @@
 		body {
 			background-color: black;
 			color: white;
+			font-family: monospace;
 		}
 		.center {
 			text-align: center;
 		}
 		.gameCanvas {
 			outline: white 3px dotted;
+		}
+		.control {
+			color: cyan;
+			background-color: 555555;
+			border-color: cyan;
+			border-style: dotted;
+			padding-left: 10;
+			padding-right: 7;
+			font-size: 25;
+		}
+		.controllerRow{
+			padding-top: 3;
 		}
 	</style>
 </head>
@@ -250,6 +441,22 @@
 	<div id="gameArea" class="center">
 		<h1>Snake!</h1>
 		<div id="canvasArea">
+		</div> <br />
+		<div id="statsArea">
+			<div id="score">Score: 0</div>
+		</div> <br />
+		<div id="controller">
+			<div class="controllerRow">
+				<button class="control" onclick="buttons.up()">^</button>
+			</div>
+			<div class="controllerRow">
+				<button class="control" onclick="buttons.left()"><</button>
+				<button class="control" onclick="buttons.grow()">G</button>
+				<button class="control" onclick="buttons.right()">></button>
+			</div>
+			<div class="controllerRow">
+				<button class="control" onclick="buttons.down()">v</button> 
+			</div>
 		</div>
 	</div>
 </body>
