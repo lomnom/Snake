@@ -425,12 +425,14 @@
 			outline: white 3px dotted;
 		}
 		.control {
-			color: cyan;
-			background-color: 555555;
-			border-color: cyan;
-			border-style: dotted;
-			padding-left: 23;
+			color: black;
+			background-color: cyan;
+/*			border-color: cyan;*/
+			border-style: none;
+			padding-left: 17;
 			padding-right: 17;
+			padding-top: 3;
+			padding-bottom: 3;
 			font-size: 40;
 		}
 		.controllerRow{
@@ -449,15 +451,15 @@
 		</div> <br />
 		<div id="controller">
 			<div class="controllerRow">
-				<button class="control" ontouchstart="buttons.up()" onclick="buttons.up()">^</button>
+				<button class="control" ontouchstart="buttons.up()" onclick="buttons.up()">↑</button>
 			</div>
 			<div class="controllerRow">
-				<button class="control" ontouchstart="buttons.left()" onclick="buttons.left()"><</button>
+				<button class="control" ontouchstart="buttons.left()" onclick="buttons.left()">←</button>
 				<button class="control" ontouchstart="buttons.grow()" onclick="buttons.grow()">G</button>
-				<button class="control" ontouchstart="buttons.right()" onclick="buttons.right()">></button>
+				<button class="control" ontouchstart="buttons.right()" onclick="buttons.right()">→</button>
 			</div>
 			<div class="controllerRow">
-				<button class="control" ontouchstart="buttons.down()" onclick="buttons.down()">v</button> 
+				<button class="control" ontouchstart="buttons.down()" onclick="buttons.down()">↓</button> 
 			</div>
 		</div>
 	</div>
