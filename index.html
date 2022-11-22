@@ -415,6 +415,7 @@
 			background-color: black;
 			color: white;
 			font-family: monospace;
+			touch-action: manipulation;
 		}
 		.center {
 			text-align: center;
@@ -447,15 +448,15 @@
 		</div> <br />
 		<div id="controller">
 			<div class="controllerRow">
-				<button class="control" onclick="buttons.up()">^</button>
+				<button class="control" ontouchstart="buttons.up()" onclick="buttons.up()">^</button>
 			</div>
 			<div class="controllerRow">
-				<button class="control" onclick="buttons.left()"><</button>
-				<button class="control" onclick="buttons.grow()">G</button>
-				<button class="control" onclick="buttons.right()">></button>
+				<button class="control" ontouchstart="buttons.left()" onclick="buttons.left()"><</button>
+				<button class="control" ontouchstart="buttons.grow()" onclick="buttons.grow()">G</button>
+				<button class="control" ontouchstart="buttons.right()" onclick="buttons.right()">></button>
 			</div>
 			<div class="controllerRow">
-				<button class="control" onclick="buttons.down()">v</button> 
+				<button class="control" ontouchstart="buttons.down()" onclick="buttons.down()">v</button> 
 			</div>
 		</div>
 	</div>
