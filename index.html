@@ -18,7 +18,8 @@
 
 		let spriteInit={
 			fromArt: 1,
-			fromMatrix: 2
+			fromMatrix: 2,
+			empty: 3
 		}
 
 		let t={
@@ -74,8 +75,11 @@
 
 		class Sprite{
 			constructor(from,data){
+				this.empty=false;
 				if (from==spriteInit.fromArt){
 					this.fromArt(data);
+				} else if (from==spriteInit.empty){
+					this.empty=true
 				} else {
 					this.sprite=data;
 				}
@@ -105,9 +109,13 @@
 			}
 		}
 
-		function square(color,x,y,size,ctx){
+		function rect(color,x,y,height,width,ctx){
 			ctx.fillStyle = color;
-			ctx.fillRect( x, y, size, size );
+			ctx.fillRect( x, y, height, width );
+		}
+
+		function square(color,x,y,size,ctx){
+			rect(color,x,y,size,size,ctx)
 		}
 
 		function pixel(color,x,y,size,ctx){
@@ -132,20 +140,30 @@
 			}
 
 			setSprite(sprite,sx,sy){
-				sprite=sprite.sprite;
-				for (var y=0;y<spriteSz;y++){
-					for (var x=0;x<spriteSz;x++){
-						this.setSpixel(sprite[y][x],sx,sy,x,y);
+				if (!sprite.empty){
+					sprite=sprite.sprite;
+					for (var y=0;y<spriteSz;y++){
+						for (var x=0;x<spriteSz;x++){
+							this.setSpixel(sprite[y][x],sx,sy,x,y);
+						}
 					}
 				}
 			}
 
 			fillSprite(sprite){
+				if (sprite.empty){
+					this.clear();
+					return;
+				}
 				for (var y=0;y<this.height;y++){
 					for (var x=0;x<this.width;x++){
 						this.setSprite(sprite,x,y);
 					}
 				}
+			}
+
+			clear(){
+				rect(palette[' '],0,0,this.height*spriteSz*this.scale,this.width*spriteSz*this.scale,this.ctx)
 			}
 		}
 
@@ -162,15 +180,7 @@
 		/////////////////////////////THE GAME
 		let sprites={
 			empty : new Sprite(
-						spriteInit.fromArt,
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "+
-			        	"        "
+						spriteInit.empty
 				    ),
 			body  : new Sprite(
 						spriteInit.fromArt,
@@ -442,6 +452,7 @@
 </head>
 
 <body>
+	<title>Goofy Snake</title>
 	<div id="gameArea" class="center">
 		<h1>Snake!</h1>
 		<div id="canvasArea">
