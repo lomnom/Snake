@@ -345,6 +345,11 @@
 			return Math.floor(Math.random() * (max - min + 1) + min); 
 		}
 
+		var tickspeed=15;
+		function setTickSpeed(){
+			tickspeed=+window.prompt("Set snake speed (default: 15)","15");
+		}
+
 		var screen=undefined;
 		function game(){
 			let canvasArea=document.getElementById("canvasArea");
@@ -355,7 +360,6 @@
 			snake=new Snake(4,4,[[1,0]],[1,0]);
 			snake.render(screen)
 
-			var tickspeed=15;
 			var direction=undefined;
 			var grow=false;
 			var fruitX=random(0,screen.width-1);
@@ -378,6 +382,12 @@
 					grow=true;
 				}
 			}
+
+			window.addEventListener("keydown", function(e) {
+			    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+			        e.preventDefault();
+			    }
+			}, false);
 
 			document.addEventListener('keydown', function(event) {
 				if(event.keyCode == keys.up) {
@@ -454,9 +464,12 @@
 <body>
 	<title>Goofy Snake</title>
 	<div id="gameArea" class="center">
-		<h1>Snake!</h1>
+		<h1>
+			<button ontouchstart="setTickSpeed()" onclick="setTickSpeed()">S</button>nake!
+		</h1>
 		<div id="canvasArea">
 		</div> <br />
+		Control with arrow keys, press S to change speed & pause
 		<div id="statsArea">
 			<div id="score">Score: 0</div>
 		</div> <br />
