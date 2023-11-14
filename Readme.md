@@ -1,4 +1,4 @@
-# Goofysnek, an unwinnable snake game
+# Goofysnek, an unlosable snake game
 Hosted at https://goofysnek.netlify.app/
 ## Gameplay
 WHy this is BETTER:
