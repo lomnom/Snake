@@ -1,5 +1,5 @@
 # Goofysnek, an unlosable snake game
-Hosted at https://goofysnek.netlify.app/
+Hosted at https://goofysnek.netlify.app/. Mobile and desktop devices supported (keyboard & onscreen controls).
 ## Gameplay
 WHy this is BETTER:
 - **You cannot lose**:
